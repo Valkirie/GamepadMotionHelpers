@@ -7,6 +7,229 @@ Convert your gyro units into **degrees per second** and accelerometer units to *
 ## Coordinate Space
 This library uses a Y-up coordinate system. While Z-up is (only slightly) preferable for many games, PlayStation controllers use Y-up, and have set the standard for input libraries like [SDL2](https://github.com/libsdl-org/SDL) and [JSL](https://github.com/JibbSmart/JoyShockLibrary). These libraries convert inputs from other controller types to the same space used by PlayStation's DualShock 4 and DualSense, so that's what's used here.
 
+## C# Use
+```cs
+using System;
+using System.Runtime.InteropServices;
+
+namespace HandheldCompanion.Helpers
+{
+    public enum CalibrationMode
+    {
+        Manual = 0,
+        Stillness = 1,
+        SensorFusion = 2,
+    }
+
+    public class GamepadMotion : IDisposable
+    {
+        private IntPtr handle;
+        private const string DllName = "GamepadMotion.dll";
+
+        public GamepadMotion()
+        {
+            handle = CreateGamepadMotion();
+        }
+
+        ~GamepadMotion()
+        {
+            Dispose(false);
+        }
+
+        public void Reset()
+        {
+            ResetGamepadMotion(handle);
+        }
+
+        // Implement the ProcessMotion function
+        public void ProcessMotion(float gyroX, float gyroY, float gyroZ, float accelX, float accelY, float accelZ, float deltaTime)
+        {
+            ProcessMotion(handle, gyroX, gyroY, gyroZ, accelX, accelY, accelZ, deltaTime);
+        }
+
+        // Implement the GetCalibratedGyro function
+        public void GetCalibratedGyro(out float x, out float y, out float z)
+        {
+            GetCalibratedGyro(handle, out x, out y, out z);
+        }
+
+        // Implement the GetGravity function
+        public void GetGravity(out float x, out float y, out float z)
+        {
+            GetGravity(handle, out x, out y, out z);
+        }
+
+        // Implement the GetProcessedAcceleration function
+        public void GetProcessedAcceleration(out float x, out float y, out float z)
+        {
+            GetProcessedAcceleration(handle, out x, out y, out z);
+        }
+
+        // Implement the GetOrientation function
+        public void GetOrientation(out float w, out float x, out float y, out float z)
+        {
+            GetOrientation(handle, out w, out x, out y, out z);
+        }
+
+        // Implement the GetPlayerSpaceGyro function
+        public void GetPlayerSpaceGyro(out float x, out float y, float yawRelaxFactor)
+        {
+            GetPlayerSpaceGyro(handle, out x, out y, yawRelaxFactor);
+        }
+
+        // Implement the GetWorldSpaceGyro function
+        public void GetWorldSpaceGyro(out float x, out float y, float sideReductionThreshold)
+        {
+            GetWorldSpaceGyro(handle, out x, out y, sideReductionThreshold);
+        }
+
+        // Implement the StartContinuousCalibration function
+        public void StartContinuousCalibration()
+        {
+            StartContinuousCalibration(handle);
+        }
+
+        // Implement the PauseContinuousCalibration function
+        public void PauseContinuousCalibration()
+        {
+            PauseContinuousCalibration(handle);
+        }
+
+        // Implement the ResetContinuousCalibration function
+        public void ResetContinuousCalibration()
+        {
+            ResetContinuousCalibration(handle);
+        }
+
+        // Implement the GetCalibrationOffset function
+        public void GetCalibrationOffset(out float xOffset, out float yOffset, out float zOffset)
+        {
+            GetCalibrationOffset(handle, out xOffset, out yOffset, out zOffset);
+        }
+
+        // Implement the SetCalibrationOffset function
+        public void SetCalibrationOffset(float xOffset, float yOffset, float zOffset, int weight)
+        {
+            SetCalibrationOffset(handle, xOffset, yOffset, zOffset, weight);
+        }
+
+        // Implement the GetAutoCalibrationConfidence function
+        public float GetAutoCalibrationConfidence()
+        {
+            return GetAutoCalibrationConfidence(handle);
+        }
+
+        // Implement the SetAutoCalibrationConfidence function
+        public void SetAutoCalibrationConfidence(float newConfidence)
+        {
+            SetAutoCalibrationConfidence(handle, newConfidence);
+        }
+
+        // Implement the GetAutoCalibrationIsSteady function
+        public bool GetAutoCalibrationIsSteady()
+        {
+            return GetAutoCalibrationIsSteady(handle);
+        }
+
+        // Implement the GetCalibrationMode function
+        public CalibrationMode GetCalibrationMode()
+        {
+            return GetCalibrationMode(handle);
+        }
+
+        // Implement the SetCalibrationMode function
+        public void SetCalibrationMode(CalibrationMode calibrationMode)
+        {
+            SetCalibrationMode(handle, calibrationMode);
+        }
+
+        // Implement the ResetMotion function
+        public void ResetMotion()
+        {
+            ResetMotion(handle);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (handle != IntPtr.Zero)
+            {
+                DeleteGamepadMotion(handle);
+                handle = IntPtr.Zero;
+            }
+        }
+
+        [DllImport(DllName)]
+        private static extern IntPtr CreateGamepadMotion();
+
+        [DllImport(DllName)]
+        private static extern void DeleteGamepadMotion(IntPtr motion);
+
+        [DllImport(DllName)]
+        private static extern void ResetGamepadMotion(IntPtr motion);
+
+        [DllImport(DllName)]
+        private static extern void ProcessMotion(IntPtr motion, float gyroX, float gyroY, float gyroZ, float accelX, float accelY, float accelZ, float deltaTime);
+
+        [DllImport(DllName)]
+        private static extern void GetCalibratedGyro(IntPtr motion, out float x, out float y, out float z);
+
+        [DllImport(DllName)]
+        private static extern void GetGravity(IntPtr motion, out float x, out float y, out float z);
+
+        [DllImport(DllName)]
+        private static extern void GetProcessedAcceleration(IntPtr motion, out float x, out float y, out float z);
+
+        [DllImport(DllName)]
+        private static extern void GetOrientation(IntPtr motion, out float w, out float x, out float y, out float z);
+
+        [DllImport(DllName)]
+        private static extern void GetPlayerSpaceGyro(IntPtr motion, out float x, out float y, float yawRelaxFactor);
+
+        [DllImport(DllName)]
+        private static extern void GetWorldSpaceGyro(IntPtr motion, out float x, out float y, float sideReductionThreshold);
+
+        [DllImport(DllName)]
+        private static extern void StartContinuousCalibration(IntPtr motion);
+
+        [DllImport(DllName)]
+        private static extern void PauseContinuousCalibration(IntPtr motion);
+
+        [DllImport(DllName)]
+        private static extern void ResetContinuousCalibration(IntPtr motion);
+
+        [DllImport(DllName)]
+        private static extern void GetCalibrationOffset(IntPtr motion, out float xOffset, out float yOffset, out float zOffset);
+
+        [DllImport(DllName)]
+        private static extern void SetCalibrationOffset(IntPtr motion, float xOffset, float yOffset, float zOffset, int weight);
+
+        [DllImport(DllName)]
+        private static extern float GetAutoCalibrationConfidence(IntPtr motion);
+
+        [DllImport(DllName)]
+        private static extern void SetAutoCalibrationConfidence(IntPtr motion, float newConfidence);
+
+        [DllImport(DllName)]
+        private static extern bool GetAutoCalibrationIsSteady(IntPtr motion);
+
+        [DllImport(DllName)]
+        private static extern CalibrationMode GetCalibrationMode(IntPtr motion);
+
+        [DllImport(DllName)]
+        private static extern void SetCalibrationMode(IntPtr motion, CalibrationMode calibrationMode);
+
+        [DllImport(DllName)]
+        private static extern void ResetMotion(IntPtr motion);
+    }
+}
+```
+
 ## Basic Use
 Include the GamepadMotion.hpp file in your C++ project. That's it! Everything you need is in that file, and its only dependency is ```<math.h>```.
 
