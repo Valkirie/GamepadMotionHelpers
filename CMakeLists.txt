@@ -1,11 +1,13 @@
 cmake_minimum_required(VERSION 3.8)
 
-project(GamepadMotionHelpers LANGUAGES CXX)
+set(project "GamepadMotion")
 
-add_library(${PROJECT_NAME} INTERFACE)
-add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
-target_include_directories(${PROJECT_NAME}
-        INTERFACE
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-            $<INSTALL_INTERFACE:include>)
-		
+set(all_file
+  "GamepadMotion.cpp"
+ )
+
+ set(BUILD_SHARED_LIBS true)
+ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS true)
+
+add_library(${project} ${all_file})
+

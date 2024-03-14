@@ -5,6 +5,7 @@
 #pragma once
 
 #define _USE_MATH_DEFINES
+#define GamepadMotion_WRAPPER _declspec(dllexport)
 #include <math.h>
 #include <algorithm> // std::min, std::max and std::clamp
 
@@ -275,6 +276,143 @@ private:
 	void GetCalibratedSensor(float& gyroOffsetX, float& gyroOffsetY, float& gyroOffsetZ, float& accelMagnitude);
 };
 
+extern "C" {
+	// Creates a new GamepadMotion object
+	GamepadMotion_WRAPPER GamepadMotion* CreateGamepadMotion() {
+		return new GamepadMotion();
+	}
+
+	// Delete a new GamepadMotion object
+	GamepadMotion_WRAPPER void DeleteGamepadMotion(GamepadMotion* motion)
+	{
+		if (motion != nullptr) {
+			delete motion;
+			motion = nullptr; // Optional: Set the pointer to nullptr to avoid dangling references
+		}
+	}
+
+	// Resets the GamepadMotion object
+	GamepadMotion_WRAPPER void ResetGamepadMotion(GamepadMotion* motion) {
+		if (motion) {
+			motion->Reset();
+		}
+	}
+
+	// Processes motion input for the GamepadMotion object
+	GamepadMotion_WRAPPER void ProcessMotion(GamepadMotion* motion, float gyroX, float gyroY, float gyroZ,
+		float accelX, float accelY, float accelZ, float deltaTime) {
+		if (motion) {
+			motion->ProcessMotion(gyroX, gyroY, gyroZ, accelX, accelY, accelZ, deltaTime);
+		}
+	}
+
+	// Wrapper methods to call GamepadMotion functions
+	GamepadMotion_WRAPPER void GetCalibratedGyro(GamepadMotion* motion, float& x, float& y, float& z) {
+		if (motion) {
+			motion->GetCalibratedGyro(x, y, z);
+		}
+	}
+
+	GamepadMotion_WRAPPER void GetGravity(GamepadMotion* motion, float& x, float& y, float& z) {
+		if (motion) {
+			motion->GetGravity(x, y, z);
+		}
+	}
+
+	GamepadMotion_WRAPPER void GetProcessedAcceleration(GamepadMotion* motion, float& x, float& y, float& z) {
+		if (motion) {
+			motion->GetProcessedAcceleration(x, y, z);
+		}
+	}
+
+	GamepadMotion_WRAPPER void GetOrientation(GamepadMotion* motion, float& w, float& x, float& y, float& z) {
+		if (motion) {
+			motion->GetOrientation(w, x, y, z);
+		}
+	}
+
+	GamepadMotion_WRAPPER void GetPlayerSpaceGyro(GamepadMotion* motion, float& x, float& y, const float yawRelaxFactor = 1.41f) {
+		if (motion) {
+			motion->GetPlayerSpaceGyro(x, y, yawRelaxFactor);
+		}
+	}
+
+	GamepadMotion_WRAPPER void GetWorldSpaceGyro(GamepadMotion* motion, float& x, float& y, const float sideReductionThreshold = 0.125f) {
+		if (motion) {
+			motion->GetWorldSpaceGyro(x, y, sideReductionThreshold);
+		}
+	}
+
+	// Gyro calibration functions
+	GamepadMotion_WRAPPER void StartContinuousCalibration(GamepadMotion* motion) {
+		if (motion) {
+			motion->StartContinuousCalibration();
+		}
+	}
+
+	GamepadMotion_WRAPPER void PauseContinuousCalibration(GamepadMotion* motion) {
+		if (motion) {
+			motion->PauseContinuousCalibration();
+		}
+	}
+
+	GamepadMotion_WRAPPER void ResetContinuousCalibration(GamepadMotion* motion) {
+		if (motion) {
+			motion->ResetContinuousCalibration();
+		}
+	}
+
+	GamepadMotion_WRAPPER void GetCalibrationOffset(GamepadMotion* motion, float& xOffset, float& yOffset, float& zOffset) {
+		if (motion) {
+			motion->GetCalibrationOffset(xOffset, yOffset, zOffset);
+		}
+	}
+
+	GamepadMotion_WRAPPER void SetCalibrationOffset(GamepadMotion* motion, float xOffset, float yOffset, float zOffset, int weight) {
+		if (motion) {
+			motion->SetCalibrationOffset(xOffset, yOffset, zOffset, weight);
+		}
+	}
+
+	GamepadMotion_WRAPPER float GetAutoCalibrationConfidence(GamepadMotion* motion) {
+		if (motion) {
+			return motion->GetAutoCalibrationConfidence();
+		}
+		return 0.0f; // Default confidence value
+	}
+
+	GamepadMotion_WRAPPER void SetAutoCalibrationConfidence(GamepadMotion* motion, float newConfidence) {
+		if (motion) {
+			motion->SetAutoCalibrationConfidence(newConfidence);
+		}
+	}
+
+	GamepadMotion_WRAPPER bool GetAutoCalibrationIsSteady(GamepadMotion* motion) {
+		if (motion) {
+			return motion->GetAutoCalibrationIsSteady();
+		}
+		return false; // Default steady state
+	}
+
+	GamepadMotion_WRAPPER GamepadMotionHelpers::CalibrationMode GetCalibrationMode(GamepadMotion* motion) {
+		if (motion) {
+			return motion->GetCalibrationMode();
+		}
+		return GamepadMotionHelpers::CalibrationMode::Manual; // Default calibration mode
+	}
+
+	GamepadMotion_WRAPPER void SetCalibrationMode(GamepadMotion* motion, GamepadMotionHelpers::CalibrationMode calibrationMode) {
+		if (motion) {
+			motion->SetCalibrationMode(calibrationMode);
+		}
+	}
+
+	GamepadMotion_WRAPPER void ResetMotion(GamepadMotion* motion) {
+		if (motion) {
+			motion->ResetMotion();
+		}
+	}
+}
 ///////////// Everything below here are just implementation details /////////////
 
 namespace GamepadMotionHelpers
